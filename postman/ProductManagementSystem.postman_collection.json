@@ -1,0 +1,852 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Product Management System",
+    "description": "Complete API collection for the Product Management System.\n\n**Setup:**\n1. Import this collection and the companion environment file `ProductManagementSystem.postman_environment.json`.\n2. Select the `Product Management System` environment.\n3. Run **Auth → Login** — the `{{token}}` variable is set automatically via the test script.\n4. All other requests will include the Bearer token automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.data.token);",
+                  "    pm.environment.set('token', json.data.token);",
+                  "    pm.test('Login successful', () => pm.expect(json.success).to.be.true);",
+                  "    pm.test('Token received', () => pm.expect(json.data.token).to.be.a('string'));",
+                  "} else {",
+                  "    pm.test('Login failed', () => pm.expect.fail('Expected 200, got ' + pm.response.code));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate with admin credentials. On success the JWT is automatically stored in `{{token}}` and used by all subsequent requests."
+          },
+          "response": [
+            {
+              "name": "200 OK – Login successful",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@1234\"\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"token\": \"<jwt>\",\n    \"user\": { \"id\": \"<uuid>\", \"email\": \"admin@example.com\" }\n  }\n}"
+            },
+            {
+              "name": "401 Unauthorized – Invalid credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"wrong\"\n}"
+                },
+                "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid credentials.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Returns all categories ordered by creation date."
+          },
+          "response": [
+            {
+              "name": "200 OK – Category list",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    { \"id\": \"<uuid>\", \"uniqueId\": \"CAT-0001\", \"name\": \"Electronics\", \"createdAt\": \"2025-01-01T00:00:00.000Z\", \"updatedAt\": \"2025-01-01T00:00:00.000Z\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Category By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                { "key": "id", "value": "<category-uuid>", "description": "Category UUID" }
+              ]
+            },
+            "description": "Returns a single category by its UUID."
+          },
+          "response": [
+            {
+              "name": "200 OK – Category found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"], "variable": [{ "key": "id", "value": "<uuid>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": { \"id\": \"<uuid>\", \"uniqueId\": \"CAT-0001\", \"name\": \"Electronics\", \"createdAt\": \"2025-01-01T00:00:00.000Z\", \"updatedAt\": \"2025-01-01T00:00:00.000Z\" }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"], "variable": [{ "key": "id", "value": "<invalid-uuid>" }] }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Category not found.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Creates a new category. Name must be unique (case-insensitive). Returns the created category with auto-generated `uniqueId`."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Electronics\"\n}" },
+                "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Category created successfully.\",\n  \"data\": { \"id\": \"<uuid>\", \"uniqueId\": \"CAT-0001\", \"name\": \"Electronics\", \"createdAt\": \"2025-01-01T00:00:00.000Z\", \"updatedAt\": \"2025-01-01T00:00:00.000Z\" }\n}"
+            },
+            {
+              "name": "409 Conflict – Duplicate name",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Electronics\"\n}" },
+                "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Category name already exists.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Consumer Electronics\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                { "key": "id", "value": "<category-uuid>", "description": "Category UUID" }
+              ]
+            },
+            "description": "Updates the category name. Uniqueness is checked excluding the current record."
+          },
+          "response": [
+            {
+              "name": "200 OK – Updated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Consumer Electronics\"\n}" },
+                "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"], "variable": [{ "key": "id", "value": "<uuid>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Category updated successfully.\",\n  \"data\": { \"id\": \"<uuid>\", \"uniqueId\": \"CAT-0001\", \"name\": \"Consumer Electronics\", \"createdAt\": \"2025-01-01T00:00:00.000Z\", \"updatedAt\": \"2025-01-02T00:00:00.000Z\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                { "key": "id", "value": "<category-uuid>", "description": "Category UUID" }
+              ]
+            },
+            "description": "Deletes a category by UUID. Returns 204 No Content on success."
+          },
+          "response": [
+            {
+              "name": "204 No Content – Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"], "variable": [{ "key": "id", "value": "<uuid>" }] }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": ""
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/categories/:id", "host": ["{{baseUrl}}"], "path": ["categories", ":id"], "variable": [{ "key": "id", "value": "<invalid-uuid>" }] }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Category not found.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?page=1&pageSize=10&search=&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                { "key": "page",      "value": "1",         "description": "Page number (default: 1)" },
+                { "key": "pageSize",  "value": "10",        "description": "Records per page (default: 10, max: 100)" },
+                { "key": "search",    "value": "",          "description": "Search by product name or category name (optional)" },
+                { "key": "sortBy",    "value": "createdAt", "description": "Sort column: name | price | createdAt" },
+                { "key": "sortOrder", "value": "desc",      "description": "Sort direction: asc | desc" }
+              ]
+            },
+            "description": "Returns a paginated, searchable, sortable list of products. Each product includes its category. Default sort is `createdAt DESC`."
+          },
+          "response": [
+            {
+              "name": "200 OK – Product list",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products?page=1&pageSize=10", "host": ["{{baseUrl}}"], "path": ["products"] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"items\": [\n      {\n        \"id\": \"<uuid>\",\n        \"uniqueId\": \"PRD-0001\",\n        \"name\": \"Gaming Laptop\",\n        \"imageUrl\": \"https://example.com/images/gaming-laptop.jpg\",\n        \"price\": \"1299.99\",\n        \"categoryId\": \"<uuid>\",\n        \"category\": { \"name\": \"Electronics\" },\n        \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n        \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 1,\n      \"page\": 1,\n      \"pageSize\": 10,\n      \"totalPages\": 1,\n      \"hasNext\": false,\n      \"hasPrev\": false\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                { "key": "id", "value": "<product-uuid>", "description": "Product UUID" }
+              ]
+            },
+            "description": "Returns a single product by its UUID, including the associated category."
+          },
+          "response": [
+            {
+              "name": "200 OK – Product found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/:id", "host": ["{{baseUrl}}"], "path": ["products", ":id"], "variable": [{ "key": "id", "value": "<uuid>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"<uuid>\",\n    \"uniqueId\": \"PRD-0001\",\n    \"name\": \"Gaming Laptop\",\n    \"imageUrl\": \"https://example.com/images/gaming-laptop.jpg\",\n    \"price\": \"1299.99\",\n    \"categoryId\": \"<uuid>\",\n    \"category\": { \"name\": \"Electronics\" },\n    \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/:id", "host": ["{{baseUrl}}"], "path": ["products", ":id"], "variable": [{ "key": "id", "value": "<invalid-uuid>" }] }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Product not found.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gaming Laptop\",\n  \"categoryId\": \"<category-uuid>\",\n  \"price\": 1299.99,\n  \"imageUrl\": \"https://example.com/images/gaming-laptop.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Creates a new product. `categoryId` must be a valid existing category UUID. `price` must be > 0. `imageUrl` must be a valid URL."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Gaming Laptop\",\n  \"categoryId\": \"<uuid>\",\n  \"price\": 1299.99,\n  \"imageUrl\": \"https://example.com/images/gaming-laptop.jpg\"\n}" },
+                "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Product created successfully.\",\n  \"data\": {\n    \"id\": \"<uuid>\",\n    \"uniqueId\": \"PRD-0001\",\n    \"name\": \"Gaming Laptop\",\n    \"imageUrl\": \"https://example.com/images/gaming-laptop.jpg\",\n    \"price\": \"1299.99\",\n    \"categoryId\": \"<uuid>\",\n    \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2025-01-01T00:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "422 Unprocessable Entity – Validation error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"\",\n  \"categoryId\": \"not-a-uuid\",\n  \"price\": -5,\n  \"imageUrl\": \"not-a-url\"\n}" },
+                "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed.\",\n  \"errors\": [\n    { \"field\": \"name\", \"message\": \"Product name is required.\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gaming Laptop Pro\",\n  \"categoryId\": \"<category-uuid>\",\n  \"price\": 1499.99,\n  \"imageUrl\": \"https://example.com/images/gaming-laptop-pro.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                { "key": "id", "value": "<product-uuid>", "description": "Product UUID" }
+              ]
+            },
+            "description": "Updates all fields of an existing product."
+          },
+          "response": [
+            {
+              "name": "200 OK – Updated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Gaming Laptop Pro\",\n  \"categoryId\": \"<uuid>\",\n  \"price\": 1499.99,\n  \"imageUrl\": \"https://example.com/images/gaming-laptop-pro.jpg\"\n}" },
+                "url": { "raw": "{{baseUrl}}/products/:id", "host": ["{{baseUrl}}"], "path": ["products", ":id"], "variable": [{ "key": "id", "value": "<uuid>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Product updated successfully.\",\n  \"data\": {\n    \"id\": \"<uuid>\",\n    \"uniqueId\": \"PRD-0001\",\n    \"name\": \"Gaming Laptop Pro\",\n    \"imageUrl\": \"https://example.com/images/gaming-laptop-pro.jpg\",\n    \"price\": \"1499.99\",\n    \"categoryId\": \"<uuid>\",\n    \"createdAt\": \"2025-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2025-01-02T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                { "key": "id", "value": "<product-uuid>", "description": "Product UUID" }
+              ]
+            },
+            "description": "Deletes a product by UUID. Returns 204 No Content on success."
+          },
+          "response": [
+            {
+              "name": "204 No Content – Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/:id", "host": ["{{baseUrl}}"], "path": ["products", ":id"], "variable": [{ "key": "id", "value": "<uuid>" }] }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Import",
+      "item": [
+        {
+          "name": "Upload CSV",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Select a .csv file to upload. Expected columns: Product Name, Category, Price, Image URL"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/import",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "import"]
+            },
+            "description": "Uploads a CSV file for bulk product import. The file is queued for background processing. Returns 202 with the BullMQ `jobId` immediately.\n\n**CSV format:**\n```\nProduct Name,Category,Price,Image URL\nGaming Laptop,Electronics,1299.99,https://example.com/images/gaming-laptop.jpg\n```"
+          },
+          "response": [
+            {
+              "name": "202 Accepted – Import queued",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "" }] },
+                "url": { "raw": "{{baseUrl}}/products/import", "host": ["{{baseUrl}}"], "path": ["products", "import"] }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Import started successfully.\",\n  \"data\": { \"jobId\": \"<bullmq-job-id>\" }\n}"
+            },
+            {
+              "name": "400 Bad Request – Invalid file type",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "" }] },
+                "url": { "raw": "{{baseUrl}}/products/import", "host": ["{{baseUrl}}"], "path": ["products", "import"] }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Only .csv files are allowed.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Import History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/import/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "import", "history"]
+            },
+            "description": "Returns all import jobs ordered by most recent first."
+          },
+          "response": [
+            {
+              "name": "200 OK – Import history",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/import/history", "host": ["{{baseUrl}}"], "path": ["products", "import", "history"] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"items\": [\n      {\n        \"id\": \"<uuid>\",\n        \"jobId\": \"<bullmq-job-id>\",\n        \"fileName\": \"products.csv\",\n        \"status\": \"completed\",\n        \"totalRows\": 100,\n        \"processedRows\": 100,\n        \"successfulRows\": 100,\n        \"failedRows\": 0,\n        \"errorCsvPath\": null,\n        \"startedAt\": \"2025-01-01T00:01:00.000Z\",\n        \"completedAt\": \"2025-01-01T00:01:05.000Z\",\n        \"createdAt\": \"2025-01-01T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Import Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/import/status/:jobId",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "import", "status", ":jobId"],
+              "variable": [
+                { "key": "jobId", "value": "<bullmq-job-id>", "description": "BullMQ job ID returned by the upload endpoint" }
+              ]
+            },
+            "description": "Polls the current status and progress of an import job. Used by the frontend status banner."
+          },
+          "response": [
+            {
+              "name": "200 OK – Job status",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/import/status/:jobId", "host": ["{{baseUrl}}"], "path": ["products", "import", "status", ":jobId"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"processing\",\n    \"totalRows\": 100,\n    \"processedRows\": 45,\n    \"successfulRows\": 0,\n    \"failedRows\": 0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Download Error CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/import/error/:jobId",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "import", "error", ":jobId"],
+              "variable": [
+                { "key": "jobId", "value": "<bullmq-job-id>", "description": "BullMQ job ID of a failed import" }
+              ]
+            },
+            "description": "Streams the error CSV file for a failed import job. The CSV contains the original rows plus per-field error columns."
+          },
+          "response": [
+            {
+              "name": "200 OK – Error CSV file (streamed)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/import/error/:jobId", "host": ["{{baseUrl}}"], "path": ["products", "import", "error", ":jobId"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                { "key": "Content-Type", "value": "text/csv" },
+                { "key": "Content-Disposition", "value": "attachment; filename=\"error-report.csv\"" }
+              ],
+              "body": "Row Number,Product Name,Category,Price,Image URL,Product Name Error,Category Error,Price Error,Image URL Error\n2,,,,-99,,,Price must be a positive number,\n"
+            },
+            {
+              "name": "404 Not Found – No error file",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/import/error/:jobId", "host": ["{{baseUrl}}"], "path": ["products", "import", "error", ":jobId"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Error report not found.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Download Sample Template",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/import/template",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "import", "template"]
+            },
+            "description": "Downloads `sample-products.csv` — a template file with the correct column headers and one example row."
+          },
+          "response": [
+            {
+              "name": "200 OK – Template CSV (streamed)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/import/template", "host": ["{{baseUrl}}"], "path": ["products", "import", "template"] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                { "key": "Content-Type", "value": "text/csv" },
+                { "key": "Content-Disposition", "value": "attachment; filename=\"sample-products.csv\"" }
+              ],
+              "body": "Product Name,Category,Price,Image URL\nGaming Laptop,Electronics,1299.99,https://example.com/images/gaming-laptop.jpg\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Report",
+      "item": [
+        {
+          "name": "Generate Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/report?search=&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "report"],
+              "query": [
+                { "key": "search",    "value": "",          "description": "Filter by product/category name (optional)" },
+                { "key": "sortBy",    "value": "createdAt", "description": "Sort column: name | price | createdAt" },
+                { "key": "sortOrder", "value": "desc",      "description": "Sort direction: asc | desc" }
+              ]
+            },
+            "description": "Queues a background CSV report generation job. Returns 202 immediately with a `jobId`. The report includes ALL matching products (not paginated). Poll **Get Report Status** until `completed`, then call **Download Report**."
+          },
+          "response": [
+            {
+              "name": "202 Accepted – Report queued",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/report", "host": ["{{baseUrl}}"], "path": ["products", "report"] }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Report generation started.\",\n  \"data\": { \"jobId\": \"<bullmq-job-id>\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Report Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/report/:jobId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "report", ":jobId", "status"],
+              "variable": [
+                { "key": "jobId", "value": "<bullmq-job-id>", "description": "Job ID returned by Generate Report" }
+              ]
+            },
+            "description": "Polls the status of a report generation job. Poll every 2 seconds until status is `completed` or `failed`."
+          },
+          "response": [
+            {
+              "name": "200 OK – Processing",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/report/:jobId/status", "host": ["{{baseUrl}}"], "path": ["products", "report", ":jobId", "status"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": { \"status\": \"processing\" }\n}"
+            },
+            {
+              "name": "200 OK – Completed",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/report/:jobId/status", "host": ["{{baseUrl}}"], "path": ["products", "report", ":jobId", "status"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"data\": { \"status\": \"completed\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Download Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/report/:jobId/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "report", ":jobId", "download"],
+              "variable": [
+                { "key": "jobId", "value": "<bullmq-job-id>", "description": "Job ID of a completed report" }
+              ]
+            },
+            "description": "Streams the generated report CSV file. Only available after status is `completed`. Columns: Product Name, Category, Price, Image URL, Created Date."
+          },
+          "response": [
+            {
+              "name": "200 OK – Report CSV (streamed)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/report/:jobId/download", "host": ["{{baseUrl}}"], "path": ["products", "report", ":jobId", "download"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                { "key": "Content-Type", "value": "text/csv" },
+                { "key": "Content-Disposition", "value": "attachment; filename=\"products-report.csv\"" }
+              ],
+              "body": "Product Name,Category,Price,Image URL,Created Date\nGaming Laptop,Electronics,1299.99,https://example.com/images/gaming-laptop.jpg,2025-01-01\n"
+            },
+            {
+              "name": "404 Not Found – Report not ready",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": { "raw": "{{baseUrl}}/products/report/:jobId/download", "host": ["{{baseUrl}}"], "path": ["products", "report", ":jobId", "download"], "variable": [{ "key": "jobId", "value": "<id>" }] }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Report not found or not yet ready.\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,278 @@
+@use '@angular/material' as mat;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Design tokens
+// ─────────────────────────────────────────────────────────────────────────────
+:root {
+  --pms-bg:              #f1f5f9;
+  --pms-surface:         #ffffff;
+  --pms-border:          #e2e8f0;
+  --pms-border-muted:    #f1f5f9;
+
+  --pms-primary:         #2563eb;
+  --pms-primary-hover:   #1d4ed8;
+  --pms-primary-light:   #eff6ff;
+  --pms-primary-muted:   #bfdbfe;
+
+  --pms-nav:             #0f172a;
+
+  --pms-text:            #0f172a;
+  --pms-text-secondary:  #475569;
+  --pms-text-muted:      #94a3b8;
+
+  --pms-success:         #059669;
+  --pms-success-bg:      #ecfdf5;
+  --pms-success-border:  #a7f3d0;
+  --pms-error:           #dc2626;
+  --pms-error-bg:        #fef2f2;
+  --pms-error-border:    #fecaca;
+  --pms-warning:         #d97706;
+  --pms-warning-bg:      #fffbeb;
+  --pms-warning-border:  #fde68a;
+  --pms-info:            #0284c7;
+  --pms-info-bg:         #f0f9ff;
+  --pms-info-border:     #bae6fd;
+
+  --pms-radius:          12px;
+  --pms-radius-sm:       8px;
+  --pms-radius-xs:       6px;
+
+  --pms-shadow-sm:       0 1px 3px 0 rgba(0,0,0,.08), 0 1px 2px -1px rgba(0,0,0,.05);
+  --pms-shadow:          0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
+  --pms-shadow-lg:       0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.05);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Base reset & typography
+// ─────────────────────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--pms-bg);
+  color: var(--pms-text);
+  overflow-x: hidden;
+}
+
+app-root {
+  display: block;
+  height: 100%;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Custom scrollbar
+// ─────────────────────────────────────────────────────────────────────────────
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Card overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.mat-mdc-card {
+  border: 1px solid var(--pms-border) !important;
+  border-radius: var(--pms-radius) !important;
+  box-shadow: var(--pms-shadow-sm) !important;
+  background: var(--pms-surface) !important;
+}
+
+.mat-mdc-card-content {
+  padding: 0 !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Table overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.mat-mdc-table {
+  background: var(--pms-surface) !important;
+  width: 100%;
+}
+
+.mat-mdc-header-row {
+  background: #f8fafc !important;
+  border-bottom: 1px solid var(--pms-border) !important;
+  min-height: 44px !important;
+  height: 44px !important;
+}
+
+.mat-mdc-header-cell {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--pms-text-muted) !important;
+  border-bottom: none !important;
+  padding: 0 16px !important;
+}
+
+.mat-mdc-row {
+  min-height: 60px !important;
+  height: 60px !important;
+  border-bottom: 1px solid var(--pms-border) !important;
+  transition: background 0.12s ease !important;
+}
+
+.mat-mdc-row:last-child {
+  border-bottom: none !important;
+}
+
+.mat-mdc-row:hover {
+  background: #f8fafc !important;
+}
+
+.mat-mdc-cell {
+  font-size: 14px !important;
+  color: var(--pms-text) !important;
+  border-bottom: none !important;
+  padding: 0 16px !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Paginator overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.mat-mdc-paginator {
+  background: #f8fafc !important;
+  border-top: 1px solid var(--pms-border) !important;
+  border-radius: 0 0 var(--pms-radius) var(--pms-radius) !important;
+  color: var(--pms-text-secondary) !important;
+  font-size: 13px !important;
+  font-family: 'Inter', 'Roboto', sans-serif !important;
+}
+
+.mat-mdc-paginator-range-label {
+  font-size: 13px !important;
+  color: var(--pms-text-secondary) !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Button overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.mdc-button {
+  border-radius: var(--pms-radius-sm) !important;
+  font-family: 'Inter', 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: var(--pms-primary) !important;
+  --mdc-filled-button-label-text-color: #ffffff !important;
+}
+
+.mat-mdc-unelevated-button.mat-warn {
+  --mdc-filled-button-container-color: var(--pms-error) !important;
+  --mdc-filled-button-label-text-color: #ffffff !important;
+}
+
+.mat-mdc-outlined-button {
+  border-color: var(--pms-border) !important;
+  color: var(--pms-text-secondary) !important;
+}
+
+.mat-mdc-outlined-button:not([disabled]):hover {
+  background: var(--pms-primary-light) !important;
+  border-color: var(--pms-primary) !important;
+  color: var(--pms-primary) !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Form Field overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.mdc-text-field--outlined .mdc-notched-outline__leading,
+.mdc-text-field--outlined .mdc-notched-outline__notch,
+.mdc-text-field--outlined .mdc-notched-outline__trailing {
+  border-color: var(--pms-border) !important;
+}
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled):hover
+  .mdc-notched-outline__leading,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled):hover
+  .mdc-notched-outline__notch,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled):hover
+  .mdc-notched-outline__trailing {
+  border-color: var(--pms-primary) !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Dialog overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.mat-mdc-dialog-surface {
+  border-radius: var(--pms-radius) !important;
+  box-shadow: var(--pms-shadow-lg) !important;
+}
+
+.mat-mdc-dialog-title {
+  font-family: 'Inter', 'Roboto', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--pms-text) !important;
+  padding: 20px 24px 12px !important;
+}
+
+// Ensure the floating label on the first form field is never clipped.
+// mat-dialog-content has overflow:auto; without enough top padding the label
+// (which rises ~12 px above the outline border) gets cut off.
+.mat-mdc-dialog-content {
+  padding-top: 24px !important;
+  overflow-x: hidden !important;
+}
+
+.mat-mdc-dialog-actions {
+  padding: 12px 24px 20px !important;
+  border-top: 1px solid var(--pms-border) !important;
+  gap: 8px !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Snackbar overrides
+// ─────────────────────────────────────────────────────────────────────────────
+.snackbar-success .mdc-snackbar__surface {
+  background-color: var(--pms-success) !important;
+  border-radius: var(--pms-radius-sm) !important;
+  box-shadow: var(--pms-shadow-lg) !important;
+}
+
+.snackbar-success .mdc-snackbar__label { color: #fff !important; font-weight: 500 !important; }
+.snackbar-success .mat-mdc-snack-bar-action { color: rgba(255,255,255,0.8) !important; }
+
+.snackbar-error .mdc-snackbar__surface {
+  background-color: var(--pms-error) !important;
+  border-radius: var(--pms-radius-sm) !important;
+  box-shadow: var(--pms-shadow-lg) !important;
+}
+
+.snackbar-error .mdc-snackbar__label { color: #fff !important; font-weight: 500 !important; }
+.snackbar-error .mat-mdc-snack-bar-action { color: rgba(255,255,255,0.8) !important; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Table row action buttons (products + categories)
+// Declared globally so view-encapsulation specificity never interferes.
+// ─────────────────────────────────────────────────────────────────────────────
+.mat-mdc-icon-button.action-edit,
+.mat-mdc-icon-button.action-delete {
+  --mdc-icon-button-icon-color: #94a3b8;
+  border-radius: 8px !important;
+  transition: background 0.12s ease !important;
+}
+
+.mat-mdc-icon-button.action-edit:hover,
+.mat-mdc-icon-button.action-delete:hover {
+  --mdc-icon-button-icon-color: #475569;
+  background: #f1f5f9 !important;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Material Progress Spinner color
+// ─────────────────────────────────────────────────────────────────────────────
+.mat-mdc-progress-spinner circle {
+  stroke: var(--pms-primary) !important;
+}

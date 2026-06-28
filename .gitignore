@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Build output
+dist/
+build/
+out/
+
+# TypeScript
+*.tsbuildinfo
+
+# Angular
+.angular/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploads (retain folder structure, ignore actual files)
+backend/uploads/imports/*.csv
+backend/uploads/errors/*.csv
+backend/uploads/reports/*.csv
+
+# Coverage
+coverage/
+
+# Jest
+jest_cache/
